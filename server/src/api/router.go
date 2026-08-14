@@ -47,6 +47,8 @@ type Server struct {
 	realtime  *realtime.Broker
 	wsService websocket.Upgrader
 	auth      auth.Auth
+	trustedHeaderSubject string
+	trustedHeaderName    string
 
 	userRoutes    chi.Router
 	sessionRoutes chi.Router
@@ -87,7 +89,8 @@ func New(
 	rt *realtime.Broker,
 	wsService websocket.Upgrader,
 	auth auth.Auth,
-
+	trustedHeaderSubject string,
+	trustedHeaderName string,
 	userRoutes chi.Router,
 	sessionRoutes chi.Router,
 	swaggerRoutes chi.Router,
@@ -150,6 +153,8 @@ func New(
 		boardSubscriptions:               make(map[uuid.UUID]*BoardSubscription),
 		boardSessionRequestSubscriptions: make(map[uuid.UUID]*sessionrequests.BoardSessionRequestSubscription),
 		auth:                             auth,
+		trustedHeaderSubject:             trustedHeaderSubject,
+		trustedHeaderName:                trustedHeaderName,
 		boards:                           boards,
 		columns:                          columns,
 		votings:                          votings,
@@ -215,9 +220,12 @@ func (s *Server) publicRoutes(r chi.Router) chi.Router {
 
 func (s *Server) protectedRoutes(r chi.Router) {
 	r.Group(func(r chi.Router) {
-		r.Use(s.auth.Verifier())
-		r.Use(s.auth.Authenticator())
-		r.Use(auth.AuthContext)
+		r.Use(auth.TrustedHeaderOrJWT(
+			s.trustedHeaderSubject,
+			s.trustedHeaderName,
+			s.users,
+			s.auth,
+		))
 
 		r.Route("/templates", func(r chi.Router) {
 			r.Use(s.BoardTemplateRateLimiter)

@@ -32,6 +32,7 @@ type UserDatabase interface {
 	CreateGoogleUser(ctx context.Context, id, name, avatarUrl string) (DatabaseUser, error)
 	CreateMicrosoftUser(ctx context.Context, id, name, avatarUrl string) (DatabaseUser, error)
 	CreateOIDCUser(ctx context.Context, id, name, avatarUrl string) (DatabaseUser, error)
+	CreateTrustedHeaderUser(ctx context.Context, subject, name string) (DatabaseUser, error)
 	UpdateUser(ctx context.Context, update DatabaseUserUpdate) (DatabaseUser, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) error
 	GetUser(ctx context.Context, id uuid.UUID) (DatabaseUser, error)
@@ -101,6 +102,9 @@ func (service *Service) Create(ctx context.Context, id, name, avatarUrl string, 
 	case common.TypeOIDC:
 		specificCounter = oicdUserCreatedCounter
 		user, err = service.database.CreateOIDCUser(ctx, id, name, avatarUrl)
+	case common.TrustedHeader:
+		specificCounter = trustedHeaderUserCreatedCounter
+		user, err = service.database.CreateTrustedHeaderUser(ctx, id, name)
 	default:
 		return nil, CreateUserError(BadRequest, "invalid account type", errors.New("invalid account type"))
 	}

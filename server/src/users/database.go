@@ -59,6 +59,76 @@ func (db *DB) CreateOIDCUser(ctx context.Context, id, name, avatarUrl string) (D
 	return db.createExternalUser(ctx, id, name, avatarUrl, common.TypeOIDC, "oidc_users")
 }
 
+func (db *DB) CreateTrustedHeaderUser(ctx context.Context, subject, name string) (DatabaseUser, error) {
+	name = strings.TrimSpace(name)
+	var user DatabaseUser
+	err := db.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		var extUser struct {
+			UserID uuid.UUID `bun:"user"`
+			Name   string    `bun:"name"`
+		}
+		err := tx.NewSelect().
+			Table("trusted_header_users").
+			Column("user", "name").
+			Where("subject = ?", subject).
+			Scan(ctx, &extUser)
+
+		if err == nil { // user exists
+			err = tx.NewSelect().
+				Model((*DatabaseUser)(nil)).
+				Where("id = ?", extUser.UserID).
+				Scan(ctx, &user)
+
+			if err != nil {
+				return err
+			}
+
+			if extUser.Name == user.Name && user.Name != name {
+				_, err = tx.NewUpdate().
+					Table("users").
+					Set("name = ?", name).
+					Where("id = ?", extUser.UserID).
+					Returning("*").
+					Exec(common.ContextWithValues(ctx, "Database", db), &user)
+				if err != nil {
+					return err
+				}
+			}
+
+			_, err = tx.NewUpdate().
+				Table("trusted_header_users").
+				Set("name = ?", name).
+				Where("subject = ?", subject).
+				Exec(ctx)
+
+			return err
+		}
+
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+
+		insert := DatabaseUserInsert{Name: name, AccountType: common.TrustedHeader}
+		_, err = tx.NewInsert().
+			Model(&insert).
+			Returning("*").
+			Exec(ctx, &user)
+
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.NewRaw(
+			"INSERT INTO trusted_header_users (\"user\", subject, name) VALUES (?, ?, ?)",
+			user.ID, subject, name,
+		).Exec(ctx)
+
+		return err
+	})
+
+	return user, err
+}
+
 func (db *DB) UpdateUser(ctx context.Context, update DatabaseUserUpdate) (DatabaseUser, error) {
 	update.Name = strings.TrimSpace(update.Name)
 	var user DatabaseUser

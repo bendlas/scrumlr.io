@@ -41,6 +41,10 @@ func TestNewAccountType(t *testing.T) {
 			have: "OIDC",
 			want: TypeOIDC,
 		},
+		"TRUSTED_HEADER": {
+			have: "TRUSTED_HEADER",
+			want: TrustedHeader,
+		},
 		"ANONYMOUS (lowercase)": {
 			have: "anonymous",
 			want: Anonymous,
@@ -69,6 +73,10 @@ func TestNewAccountType(t *testing.T) {
 			have: "oidc",
 			want: TypeOIDC,
 		},
+		"TRUSTED_HEADER (lowercase)": {
+			have: "trusted_header",
+			want: TrustedHeader,
+		},
 		"invalid enum value": {
 			have:      "FACEBOOK",
 			wantError: true,
@@ -93,7 +101,7 @@ func TestNewAccountType(t *testing.T) {
 }
 
 func TestAccountTypeEnum(t *testing.T) {
-	values := []AccountType{Anonymous, Google, GitHub, Microsoft, Apple, TypeOIDC}
+	values := []AccountType{Anonymous, Google, GitHub, Microsoft, Apple, TypeOIDC, TrustedHeader}
 	for _, value := range values {
 		var accountType AccountType
 		err := accountType.UnmarshalJSON(fmt.Appendf(nil, "\"%s\"", value))

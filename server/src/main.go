@@ -141,6 +141,20 @@ func main() {
 				Required: false,
 				Value:    false,
 			}),
+			altsrc.NewStringFlag(&cli.StringFlag{
+				Name:     "trusted-header-subject",
+				EnvVars:  []string{"SCRUMLR_TRUSTED_HEADER_SUBJECT"},
+				Usage:    "HTTP header injected by a trusted reverse proxy containing a stable, unique upstream user identifier; the backend must not be directly reachable when configured",
+				Required: false,
+				Value:    "",
+			}),
+			altsrc.NewStringFlag(&cli.StringFlag{
+				Name:     "trusted-header-name",
+				EnvVars:  []string{"SCRUMLR_TRUSTED_HEADER_NAME"},
+				Usage:    "optional HTTP header injected by a trusted reverse proxy containing the upstream user's display name",
+				Required: false,
+				Value:    "",
+			}),
 			altsrc.NewBoolFlag(&cli.BoolFlag{
 				Name:     "allow-anonymous-board-creation",
 				EnvVars:  []string{"SCRUMLR_ALLOW_ANONYMOUS_BOARD_CREATION"},
@@ -422,7 +436,8 @@ func run(ctx *cli.Context) error {
 		rt,
 		wsService,
 		authConfig,
-
+		ctx.String("trusted-header-subject"),
+		ctx.String("trusted-header-name"),
 		userRoutes,
 		sessionRoutes,
 		swaggerRoutes,

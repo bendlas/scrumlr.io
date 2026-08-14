@@ -30,12 +30,15 @@ const (
 
 	// TypeOIDC users registered on OIDC
 	TypeOIDC AccountType = "OIDC"
+
+	// TrustedHeader users authenticated by a trusted reverse proxy via injected headers
+	TrustedHeader AccountType = "TRUSTED_HEADER"
 )
 
 func NewAccountType(s string) (result AccountType, err error) {
 	result = AccountType(strings.ToUpper(s))
 	switch result {
-	case Anonymous, Google, Microsoft, AzureAd, GitHub, Apple, TypeOIDC:
+	case Anonymous, Google, Microsoft, AzureAd, GitHub, Apple, TypeOIDC, TrustedHeader:
 		return
 	}
 	err = errors.New("invalid account type")

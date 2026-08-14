@@ -397,6 +397,8 @@ func TestTemplateRoutesMiddlewareIntegration(t *testing.T) {
 				nil,      // realtime (not needed for templates)
 				nil,      // wsService (not needed for templates)
 				mockAuth, // auth
+				"",       // trustedHeaderSubject
+				"",       // trustedHeaderName
 				userRoutes,
 				sessionRoutes,
 				nil,                              // swaggerRoutes

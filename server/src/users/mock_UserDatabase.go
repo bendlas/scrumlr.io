@@ -572,7 +572,73 @@ func (_c *MockUserDatabase_CreateOIDCUser_Call) RunAndReturn(run func(ctx contex
 	return _c
 }
 
-// DeleteUser provides a mock function for the type MockUserDatabase
+// CreateTrustedHeaderUser provides a mock function for the type MockUserDatabase
+func (_mock *MockUserDatabase) CreateTrustedHeaderUser(ctx context.Context, subject string, name string) (DatabaseUser, error) {
+	ret := _mock.Called(ctx, subject, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateTrustedHeaderUser")
+	}
+
+	var r0 DatabaseUser
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) (DatabaseUser, error)); ok {
+		return returnFunc(ctx, subject, name)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) DatabaseUser); ok {
+		r0 = returnFunc(ctx, subject, name)
+	} else {
+		r0 = ret.Get(0).(DatabaseUser)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = returnFunc(ctx, subject, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockUserDatabase_CreateTrustedHeaderUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateTrustedHeaderUser'
+type MockUserDatabase_CreateTrustedHeaderUser_Call struct {
+	*mock.Call
+}
+
+// CreateTrustedHeaderUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - subject string
+//   - name string
+func (_e *MockUserDatabase_Expecter) CreateTrustedHeaderUser(ctx any, subject any, name any) *MockUserDatabase_CreateTrustedHeaderUser_Call {
+	return &MockUserDatabase_CreateTrustedHeaderUser_Call{Call: _e.mock.On("CreateTrustedHeaderUser", ctx, subject, name)}
+}
+
+func (_c *MockUserDatabase_CreateTrustedHeaderUser_Call) Run(run func(ctx context.Context, subject string, name string)) *MockUserDatabase_CreateTrustedHeaderUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(arg0, arg1, arg2)
+	})
+	return _c
+}
+
+func (_c *MockUserDatabase_CreateTrustedHeaderUser_Call) Return(databaseUser DatabaseUser, err error) *MockUserDatabase_CreateTrustedHeaderUser_Call {
+	_c.Call.Return(databaseUser, err)
+	return _c
+}
+
+func (_c *MockUserDatabase_CreateTrustedHeaderUser_Call) RunAndReturn(run func(ctx context.Context, subject string, name string) (DatabaseUser, error)) *MockUserDatabase_CreateTrustedHeaderUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
 func (_mock *MockUserDatabase) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	ret := _mock.Called(ctx, id)
 
