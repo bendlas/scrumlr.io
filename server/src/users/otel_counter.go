@@ -50,6 +50,12 @@ var oicdUserCreatedCounter, _ = meter.Int64Counter(
 	metric.WithUnit("users"),
 )
 
+var trustedHeaderUserCreatedCounter, _ = meter.Int64Counter(
+	"scrumlr.users.trusted_header.created.counter",
+	metric.WithDescription("Number of trusted header users created"),
+	metric.WithUnit("users"),
+)
+
 var deletedUserCounter, _ = meter.Int64Counter(
 	"scrumlr.users.deleted.counter",
 	metric.WithDescription("Number of deleted users"),
